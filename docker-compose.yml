@@ -1,0 +1,30 @@
+services:
+  php-app:
+    build: ./php-app
+    container_name: oauth_php_app_dual
+    ports:
+      - "8000:80"
+    volumes:
+      - ./php-app/vulnerable:/var/www/html/vulnerable
+      - ./php-app/mitigated:/var/www/html/mitigated
+    depends_on:
+      - keycloak
+    networks:
+      - oauth_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: oauth_keycloak_server_import
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+
+    ports:
+      - "8080:8080"
+    networks:
+      - oauth_network
+
+networks:
+  oauth_network:
+    driver: bridge
